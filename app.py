@@ -2,7 +2,6 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 import time
-import math
 import uuid
 import json
 
@@ -31,8 +30,33 @@ DURATION = 30
 st.html("""
 <style>
 
+/* Hide Streamlit's top toolbar */
+
+header[data-testid="stHeader"] {
+    display: none !important;
+}
+
+[data-testid="stToolbar"] {
+    display: none !important;
+}
+
+[data-testid="stDecoration"] {
+    display: none !important;
+}
+
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+
+/* General layout */
+
 html {
-    font-size: 23px !important;
+    font-size: 16px !important;
 }
 
 .stApp {
@@ -42,365 +66,408 @@ html {
 
 .block-container {
     max-width: 1800px;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding-top: 0.8rem !important;
+    padding-bottom: 1rem !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
 }
 
-/* General font sizes */
+[data-testid="stVerticalBlock"] {
+    gap: 0.65rem;
+}
 
 .stMarkdown p,
 .stMarkdown li,
 .stText,
 .stTextInput input,
-.stSelectbox div[data-baseweb="select"],
 .stAlert p {
-    font-size: 23px !important;
-    line-height: 1.5;
+    font-size: 16px !important;
+    line-height: 1.4;
 }
 
 [data-testid="stWidgetLabel"] p {
-    font-size: 23px !important;
+    font-size: 16px !important;
     font-weight: 600;
 }
 
 [data-testid="stCaptionContainer"],
 [data-testid="stCaptionContainer"] p {
-    font-size: 21px !important;
+    font-size: 14px !important;
     line-height: 1.4;
 }
 
 [data-testid="stExpander"] summary p {
-    font-size: 23px !important;
+    font-size: 15px !important;
 }
 
 h1 {
-    font-size: 50px !important;
+    font-size: 34px !important;
     color: #174638 !important;
 }
 
 h2 {
-    font-size: 38px !important;
+    font-size: 26px !important;
     color: #174638 !important;
+    padding-top: 0.4rem !important;
+    padding-bottom: 0.3rem !important;
 }
 
 h3 {
-    font-size: 31px !important;
+    font-size: 22px !important;
     color: #174638 !important;
 }
 
-/* Input fields and buttons */
+
+/* Buttons and inputs */
 
 div[data-testid="stButton"] > button,
 div[data-testid="stFormSubmitButton"] > button {
-    border-radius: 12px;
-    font-size: 23px !important;
-    font-weight: 700;
-    min-height: 58px;
+    border-radius: 8px;
+    font-size: 16px !important;
+    font-weight: 600;
+    min-height: 40px;
 }
 
 div[data-testid="stButton"] p,
 div[data-testid="stFormSubmitButton"] p {
-    font-size: 23px !important;
+    font-size: 16px !important;
 }
 
 div[data-baseweb="select"] span,
 div[data-baseweb="select"] input,
 div[role="option"] {
-    font-size: 23px !important;
+    font-size: 16px !important;
 }
 
-div[data-testid="stMetric"] {
-    background: #FFFFFF;
-    border: 1px solid #D9E5DC;
-    border-radius: 16px;
-    padding: 18px;
-}
 
-div[data-testid="stMetricLabel"] p {
-    font-size: 23px !important;
-}
-
-div[data-testid="stMetricValue"] {
-    color: #174638;
-    font-size: 38px !important;
-    font-weight: 800;
-}
-
-/* Main header */
+/* Compact main header */
 
 .game-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 22px;
+
     background: linear-gradient(
         120deg,
         #123D32,
         #20694D
     );
 
-    border-radius: 20px;
-    padding: 28px 32px;
-    margin-bottom: 22px;
+    padding: 12px 22px;
+    border-radius: 12px;
+    margin-bottom: 10px;
 }
 
 .game-header h1 {
     color: #FFFFFF !important;
-    font-size: 52px !important;
-    margin: 0;
+    font-size: 32px !important;
     font-weight: 800;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
+    margin: 0;
+    padding: 0 !important;
 }
 
 .game-header p {
     color: #D2EBDD !important;
-    font-size: 24px !important;
-    margin: 8px 0 0 0;
+    font-size: 16px !important;
+    margin: 0;
+    padding: 0;
 }
 
-/* Footprint cards */
+
+/* Participant name */
+
+.participant-name {
+    font-size: 16px;
+    color: #496356;
+    margin: 2px 0 6px 0;
+}
+
+
+/* Original footprint cards */
 
 .footprint-card {
     background: #FFFFFF;
     border: 1px solid #D9E5DC;
-    border-radius: 16px;
-    padding: 18px;
-    min-height: 180px;
+    border-radius: 12px;
+    padding: 12px;
+    min-height: 120px;
     text-align: center;
 }
 
 .footprint-icon {
-    font-size: 43px;
+    font-size: 29px;
 }
 
 .footprint-category {
-    font-size: 24px;
+    font-size: 17px;
     font-weight: 700;
     color: #174638;
 }
 
 .footprint-value {
-    font-size: 38px;
+    font-size: 28px;
     font-weight: 800;
-    color: #BD4646;
-    margin: 8px 0;
+    color: #B94040;
+    margin: 4px 0;
 }
 
 .footprint-name {
-    font-size: 21px;
+    font-size: 15px;
     line-height: 1.4;
     color: #496356;
 }
+
 
 /* Total original footprint */
 
 .total-footprint {
     background: #FBE8E6;
-    border: 2px solid #EBC0BC;
-    border-radius: 18px;
-    padding: 22px;
-    margin-top: 15px;
+    border: 1px solid #EBC0BC;
+    border-radius: 12px;
+    padding: 10px;
+    margin-top: 4px;
     text-align: center;
 }
 
 .total-footprint-label {
-    font-size: 25px;
+    font-size: 17px;
     font-weight: 600;
     color: #993B3B;
 }
 
 .total-footprint-value {
-    font-size: 54px;
+    font-size: 36px;
     color: #B94040;
     font-weight: 800;
 }
 
-/* Achievement and final score */
 
-.score-box {
+/* Combined results panel */
+
+.result-panel {
+    position: relative;
+    overflow: hidden;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 22px;
+
     background: #FFFFFF;
-    border: 2px solid #D9E5DC;
-    border-radius: 22px;
-    padding: 28px;
-    margin-bottom: 20px;
+    border: 1px solid #D9E5DC;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 4px;
+}
+
+
+/* Achievement panel on the left */
+
+.achievement-panel {
     text-align: center;
+    padding: 10px 4px;
 }
 
 .achievement-emoji {
-    font-size: 82px;
-    line-height: 1.3;
+    font-size: 58px;
+    line-height: 1.2;
+    margin-bottom: 5px;
 }
 
 .achievement-title {
-    font-size: 42px;
+    font-size: 30px;
     color: #174638;
     font-weight: 800;
 }
 
 .score-number {
-    font-size: 100px;
+    font-size: 68px;
     font-weight: 900;
     line-height: 1.2;
-    margin: 10px 0;
+    margin: 6px 0;
 }
 
 .score-label {
-    font-size: 26px;
+    font-size: 17px;
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 0.7px;
     color: #496356;
 }
 
 .score-message {
-    font-size: 25px;
+    font-size: 16px;
     margin-top: 12px;
     color: #17382C;
+    line-height: 1.4;
 }
 
-/* Coloured result boxes */
+
+/* Three coloured boxes on the right */
+
+.summary-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    align-items: stretch;
+}
 
 .result-metric {
-    border-radius: 18px;
-    padding: 22px 16px;
-    min-height: 200px;
+    border-radius: 12px;
+    padding: 12px 8px;
+    min-height: 130px;
     text-align: center;
 }
 
+.result-metric:last-child {
+    grid-column: 1 / 3;
+    width: calc(50% - 5px);
+    justify-self: center;
+}
+
 .result-metric-icon {
-    font-size: 46px;
+    font-size: 30px;
+    line-height: 1.2;
     margin-bottom: 5px;
 }
 
 .result-metric-label {
-    font-size: 23px;
+    font-size: 16px;
     font-weight: 700;
     line-height: 1.3;
 }
 
 .result-metric-value {
-    font-size: 44px;
+    font-size: 32px;
     font-weight: 800;
-    margin-top: 12px;
+    margin-top: 7px;
 }
 
 .result-metric-unit {
-    font-size: 23px;
+    font-size: 15px;
     font-weight: 500;
 }
 
-/* Carbon impact category cards */
+
+/* Individual category results */
 
 .impact-card {
     background: #FFFFFF;
     border: 1px solid #D9E5DC;
-    border-radius: 18px;
-    padding: 20px;
-    min-height: 400px;
+    border-radius: 12px;
+    padding: 12px;
+    min-height: 320px;
 }
 
 .impact-title {
-    font-size: 30px;
+    font-size: 21px;
     color: #174638;
     font-weight: 800;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .impact-label {
-    font-size: 20px;
+    font-size: 14px;
     color: #63786B;
-    margin-top: 12px;
+    margin-top: 8px;
 }
 
 .impact-original {
-    font-size: 23px;
+    font-size: 16px;
     font-weight: 700;
     color: #B94040;
     line-height: 1.4;
 }
 
 .impact-solution {
-    font-size: 23px;
+    font-size: 16px;
     font-weight: 700;
-    color: #258052;
     line-height: 1.4;
 }
 
 .impact-reduction {
-    font-size: 43px;
+    font-size: 32px;
     font-weight: 800;
     text-align: center;
-    margin: 16px 0 0 0;
+    margin: 10px 0 0 0;
 }
 
 .impact-status {
-    font-size: 21px;
+    font-size: 15px;
     text-align: center;
     font-weight: 700;
-    margin-bottom: 18px;
+    margin-bottom: 10px;
 }
 
 .impact-bar-label {
-    font-size: 21px;
+    font-size: 15px;
     font-weight: 600;
-    margin-top: 12px;
-    margin-bottom: 5px;
+    margin-top: 8px;
+    margin-bottom: 4px;
 }
 
 .impact-bar-background {
     background: #E6ECE7;
-    height: 17px;
-    border-radius: 10px;
+    height: 10px;
+    border-radius: 6px;
     overflow: hidden;
 }
 
 .impact-bar-fill {
     height: 100%;
-    border-radius: 10px;
+    border-radius: 6px;
 }
 
 .impact-saved {
     text-align: center;
-    font-size: 23px;
+    font-size: 16px;
     font-weight: 700;
-    margin-top: 18px;
+    margin-top: 10px;
 }
 
 .impact-explanation {
-    font-size: 21px;
-    line-height: 1.5;
+    font-size: 14px;
+    line-height: 1.45;
     color: #496356;
-    margin-top: 16px;
+    margin-top: 10px;
     border-top: 1px solid #D9E5DC;
-    padding-top: 12px;
+    padding-top: 9px;
 }
 
-/* Leaderboard */
+
+/* Compact leaderboard */
 
 .leaderboard-header {
-    font-size: 38px;
+    font-size: 27px;
     font-weight: 800;
     color: #174638;
 }
 
 .leaderboard-description {
-    font-size: 21px;
+    font-size: 14px;
     color: #63786B;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .leaderboard-count {
     background: #FFFFFF;
     border: 1px solid #D9E5DC;
-    border-radius: 16px;
+    border-radius: 10px;
     text-align: center;
-    padding: 15px;
-    margin-bottom: 15px;
+    padding: 10px;
+    margin-bottom: 8px;
 }
 
 .leaderboard-count-label {
-    font-size: 23px;
+    font-size: 16px;
     color: #496356;
 }
 
 .leaderboard-count-value {
-    font-size: 43px;
+    font-size: 29px;
     font-weight: 800;
     color: #174638;
 }
@@ -408,33 +475,33 @@ div[data-testid="stMetricValue"] {
 .leaderboard-table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 8px;
+    border-spacing: 0 5px;
     table-layout: fixed;
 }
 
 .leaderboard-table th {
-    font-size: 22px;
+    font-size: 15px;
     font-weight: 700;
     color: #496356;
-    padding: 8px;
+    padding: 6px;
     text-align: left;
 }
 
 .leaderboard-table td {
     background: #FFFFFF;
-    padding: 13px 9px;
-    font-size: 23px;
+    padding: 9px 6px;
+    font-size: 16px;
     font-weight: 600;
     overflow-wrap: anywhere;
 }
 
 .leaderboard-table td:first-child {
-    border-radius: 10px 0 0 10px;
+    border-radius: 7px 0 0 7px;
     text-align: center;
 }
 
 .leaderboard-table td:last-child {
-    border-radius: 0 10px 10px 0;
+    border-radius: 0 7px 7px 0;
     text-align: right;
     color: #258052;
     font-weight: 800;
@@ -452,24 +519,89 @@ div[data-testid="stMetricValue"] {
     background: #F5E2D2;
 }
 
-/* Responsive layout */
 
-@media (max-width: 1000px) {
+/* Confetti inside the result panel */
 
-    .score-number {
-        font-size: 75px;
+.confetti-piece {
+    position: absolute;
+    top: -20px;
+    width: 9px;
+    height: 13px;
+    pointer-events: none;
+
+    animation-name: confetti-fall;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+}
+
+@keyframes confetti-fall {
+
+    0% {
+        transform: translateY(-20px) rotate(0deg);
+        opacity: 0;
     }
 
-    .result-metric-value {
-        font-size: 36px;
+    10% {
+        opacity: 1;
+    }
+
+    85% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(450px) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+
+/* Responsive layout */
+
+@media (max-width: 900px) {
+
+    .block-container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    .game-header {
+        gap: 6px;
     }
 
     .game-header h1 {
-        font-size: 40px !important;
+        font-size: 27px !important;
     }
 
-    .impact-card {
-        padding: 14px;
+    .result-panel {
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .score-number {
+        font-size: 52px;
+    }
+
+    .achievement-title {
+        font-size: 24px;
+    }
+
+    .result-metric-value {
+        font-size: 26px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .result-panel {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .confetti-piece {
+        display: none;
     }
 }
 
@@ -510,38 +642,32 @@ TRANSPORT_ACTIONS = {
     "TA02": ("Cycling", 0.00, ["Short"]),
 
     "TA03": (
-        "Motorcycle",
-        0.09,
+        "Motorcycle", 0.09,
         ["Short", "Medium"]
     ),
 
     "TA04": (
-        "Public bus",
-        0.10,
+        "Public bus", 0.10,
         ["Short", "Medium"]
     ),
 
     "TA05": (
-        "Carpool (4 people)",
-        0.04,
+        "Carpool (4 people)", 0.04,
         ["Short", "Medium", "Long"]
     ),
 
     "TA06": (
-        "MRT",
-        0.04,
+        "MRT", 0.04,
         ["Short", "Medium"]
     ),
 
     "TA07": (
-        "Electric car",
-        0.13,
+        "Electric car", 0.13,
         ["Short", "Medium", "Long"]
     ),
 
     "TA08": (
-        "Hybrid car",
-        0.12,
+        "Hybrid car", 0.12,
         ["Short", "Medium", "Long"]
     ),
 
@@ -597,35 +723,17 @@ FOOD_ACTIONS = {
 # ============================================================
 
 ACTIVITY = {
-    "A01": (
-        "Use air conditioning for 8 hours",
-        5.33
-    ),
+    "A01": ("Use air conditioning for 8 hours", 5.33),
 
-    "A02": (
-        "Leave lights on for 8 hours",
-        0.95
-    ),
+    "A02": ("Leave lights on for 8 hours", 0.95),
 
-    "A03": (
-        "Take a 15-minute hot shower",
-        0.65
-    ),
+    "A03": ("Take a 15-minute hot shower", 0.65),
 
-    "A04": (
-        "Dry clothes using a dryer (1 load)",
-        1.85
-    ),
+    "A04": ("Dry clothes using a dryer (1 load)", 1.85),
 
-    "A05": (
-        "Buy a new polyester T-shirt",
-        5.00
-    ),
+    "A05": ("Buy a new polyester T-shirt", 5.00),
 
-    "A06": (
-        "Buy a new pair of cotton jeans",
-        20.00
-    ),
+    "A06": ("Buy a new pair of cotton jeans", 20.00),
 
     "A07": (
         "Buy 5 plastic bottles of water (500 mL each)",
@@ -646,10 +754,7 @@ ACTIVITY = {
 
     "A14": ("Order food delivery twice", 0.72),
 
-    "A15": (
-        "Order 3 items online separately",
-        2.64
-    )
+    "A15": ("Order 3 items online separately", 2.64)
 }
 
 
@@ -668,10 +773,10 @@ ACTIVITY_ACTIONS = {
 
 
 # ============================================================
-# 6. ACTIVITY PRACTICALITY AND EMISSION MATRIX
+# 6. ACTIVITY EMISSION MATRIX
 # ============================================================
 
-# Values = remaining emissions (kg CO2e).
+# Remaining emissions in kg CO2e.
 # Missing combinations = Not practical.
 
 ACTIVITY_MATRIX = {
@@ -771,85 +876,66 @@ ACTIVITY_MATRIX = {
 
 EXPLANATIONS = {
 
-    "AA01": (
-        "A fan consumes considerably less electricity "
-        "than air conditioning."
-    ),
+    "AA01":
+        "A fan consumes much less electricity than AC.",
 
-    "AA02": (
-        "Shortening usage time reduces "
-        "electricity consumption."
-    ),
+    "AA02":
+        "Shorter usage reduces electricity consumption.",
 
-    "AA03": (
-        "Energy-efficient appliances provide a similar "
-        "service using less electricity."
-    ),
+    "AA03":
+        "Efficient appliances provide similar services "
+        "using less electricity.",
 
-    "AA04": (
-        "Sun-drying clothes avoids electricity "
-        "consumption by the dryer."
-    ),
+    "AA04":
+        "Sun-drying avoids electricity consumption "
+        "by the dryer.",
 
-    "AA05": (
-        "Reusing or repairing existing products "
-        "avoids or delays new product manufacturing."
-    ),
+    "AA05":
+        "Reusing or repairing products avoids or delays "
+        "new product manufacturing.",
 
-    "AA06": (
+    "AA06":
         "Buying second-hand can displace new production "
-        "when equivalent service is provided."
-    ),
+        "when equivalent service is provided.",
 
-    "AA07": (
-        "Recycled materials can reduce demand "
-        "for virgin material production."
-    ),
+    "AA07":
+        "Recycled materials can reduce demand for "
+        "virgin material production.",
 
-    "AA08": (
-        "Recycling can displace virgin materials, "
-        "but does not eliminate the original "
-        "manufacturing emissions."
-    ),
+    "AA08":
+        "Recycling can displace virgin materials but "
+        "does not eliminate manufacturing emissions.",
 
-    "AA09": (
+    "AA09":
         "Combining orders can reduce separate "
-        "delivery journeys."
-    ),
+        "delivery journeys.",
 
-    "AA10": (
+    "AA10":
         "Walking to a nearby store avoids motorised "
         "delivery emissions in this scenario."
-    )
 }
 
 
 SPECIFIC_EXPLANATIONS = {
 
-    ("A07", "AA05"): (
-        "Refill an existing bottle instead of "
-        "buying new plastic bottles."
-    ),
+    ("A07", "AA05"):
+        "Refill an existing bottle instead of buying "
+        "new plastic bottles.",
 
-    ("A08", "AA05"): (
-        "Use an existing reusable cup at "
-        "a beverage dispenser."
-    ),
+    ("A08", "AA05"):
+        "Use an existing reusable cup at a "
+        "beverage dispenser.",
 
-    ("A09", "AA05"): (
-        "Print on the unused sides of "
-        "existing paper."
-    ),
+    ("A09", "AA05"):
+        "Print on the unused sides of existing paper.",
 
-    ("A02", "AA03"): (
+    ("A02", "AA03"):
         "LED lighting consumes less electricity "
-        "than conventional bulbs."
-    ),
+        "than conventional bulbs.",
 
-    ("A03", "AA02"): (
-        "A shorter hot shower requires less "
-        "energy to heat water."
-    )
+    ("A03", "AA02"):
+        "A shorter hot shower requires less energy "
+        "to heat water."
 }
 
 
@@ -894,11 +980,13 @@ def original_emissions(category, card_id):
 def action_name(category, action_id):
 
     if action_id == "NONE":
+
         return "No action selected"
 
     value = ACTION_DATABASES[category][action_id]
 
     if isinstance(value, str):
+
         return value
 
     return value[0]
@@ -911,16 +999,16 @@ def calculate_category(category, card_id, action_id):
     )
 
     original = original_emissions(
-        category,
-        card_id
+        category, card_id
     )
 
     practical = False
+
     new = original
 
     explanation = (
-        "This action is not considered a practical "
-        "alternative to the original activity."
+        "This action is not a practical alternative "
+        "to the original activity."
     )
 
     # No action selected
@@ -949,15 +1037,15 @@ def calculate_category(category, card_id, action_id):
             new = distance * factor
 
             explanation = (
-                f"This transport mode has an assumed "
-                f"emission factor of {factor:.3f} kg CO₂e "
+                f"Assumed emission factor: "
+                f"{factor:.3f} kg CO₂e "
                 f"per passenger-km."
             )
 
         else:
 
             explanation = (
-                f"This mode of transport is not practical "
+                f"This transport mode is not practical "
                 f"for a {group.lower()}-distance journey "
                 f"under the game assumptions."
             )
@@ -980,16 +1068,16 @@ def calculate_category(category, card_id, action_id):
 
             explanation = (
                 "Different ingredients and production "
-                "systems result in different food "
+                "systems result in different "
                 "carbon footprints."
             )
 
         else:
 
             explanation = (
-                f"A {action_group.lower()} is not "
-                f"considered a practical substitute "
-                f"for a {group.lower()} in this game."
+                f"A {action_group.lower()} is not a "
+                f"practical substitute for a "
+                f"{group.lower()} in this game."
             )
 
     # Activity
@@ -1012,6 +1100,7 @@ def calculate_category(category, card_id, action_id):
     new = round(new, 2)
 
     if not practical:
+
         new = original
 
     saved = round(original - new, 2)
@@ -1046,12 +1135,7 @@ def calculate_category(category, card_id, action_id):
         "category": category,
         "card_id": card_id,
         "original_name": original_name,
-
-        "action_name": action_name(
-            category,
-            action_id
-        ),
-
+        "action_name": action_name(category, action_id),
         "original": original,
         "new": new,
         "saved": saved,
@@ -1075,13 +1159,11 @@ def calculate_total(footprints, actions):
     ]
 
     original = round(
-        sum(row["original"] for row in rows),
-        2
+        sum(row["original"] for row in rows), 2
     )
 
     new = round(
-        sum(row["new"] for row in rows),
-        2
+        sum(row["new"] for row in rows), 2
     )
 
     saved = round(original - new, 2)
@@ -1104,11 +1186,8 @@ def calculate_total(footprints, actions):
 def best_solutions(category, card_id):
 
     results = [
-
         calculate_category(
-            category,
-            card_id,
-            action_id
+            category, card_id, action_id
         )
 
         for action_id in ACTION_DATABASES[category]
@@ -1120,17 +1199,33 @@ def best_solutions(category, card_id):
     ]
 
     if not practical:
+
         return []
 
     minimum = min(
-        row["new"]
-        for row in practical
+        row["new"] for row in practical
     )
 
     return [
         row for row in practical
         if abs(row["new"] - minimum) < 0.000001
     ]
+
+
+def signed_emission_change(saved):
+
+    # Positive savings are displayed as
+    # negative emission changes.
+
+    if saved > 0:
+
+        return f"−{saved:.2f}"
+
+    elif saved < 0:
+
+        return f"+{abs(saved):.2f}"
+
+    return "0.00"
 
 
 # ============================================================
@@ -1174,10 +1269,6 @@ def achievement(score):
 # 11. TEMPORARY ONLINE LEADERBOARD
 # ============================================================
 
-# No external database.
-# Only Top 10 scores and participant count are retained.
-# Data remain available while the server process is active.
-
 @st.cache_resource
 def leaderboard_storage():
 
@@ -1200,13 +1291,11 @@ def save_score(
 
     with board["lock"]:
 
-        # Prevent an existing Top 10 entry
-        # from being saved twice.
-
         if any(
             item["id"] == player_id
             for item in board["scores"]
         ):
+
             return
 
         board["count"] += 1
@@ -1220,13 +1309,14 @@ def save_score(
         })
 
         board["scores"].sort(
-
             key=lambda item: (
                 -item["score"],
                 item["time"],
                 item["order"]
             )
         )
+
+        # Only retain the Top 10.
 
         board["scores"] = board["scores"][:10]
 
@@ -1236,11 +1326,7 @@ def get_leaderboard():
     with board["lock"]:
 
         return (
-            [
-                dict(item)
-                for item in board["scores"]
-            ],
-
+            [dict(item) for item in board["scores"]],
             board["count"]
         )
 
@@ -1250,15 +1336,13 @@ def reset_leaderboard():
     with board["lock"]:
 
         board["scores"].clear()
+
         board["count"] = 0
 
 
 # ============================================================
 # 12. SESSION STATE
 # ============================================================
-
-# Application state keys are different from all form
-# and widget identifiers.
 
 def default_state():
 
@@ -1322,9 +1406,7 @@ def start_timer():
 
     st.session_state.elapsed = 0.0
 
-    st.session_state.timer_start = (
-        time.monotonic()
-    )
+    st.session_state.timer_start = time.monotonic()
 
 
 def pause_timer():
@@ -1341,16 +1423,13 @@ def resume_timer():
         and st.session_state.timer_start is None
     ):
 
-        st.session_state.timer_start = (
-            time.monotonic()
-        )
+        st.session_state.timer_start = time.monotonic()
 
 
 def finish_timer():
 
     st.session_state.selection_time = round(
-        elapsed_time(),
-        1
+        elapsed_time(), 1
     )
 
     pause_timer()
@@ -1359,7 +1438,7 @@ def finish_timer():
 
 
 # ============================================================
-# 14. CIRCULAR COUNTDOWN WITH SOUND EFFECTS
+# 14. CIRCULAR COUNTDOWN WITH SOUND
 # ============================================================
 
 def circular_countdown():
@@ -1385,7 +1464,6 @@ def circular_countdown():
     <html>
 
     <head>
-
     <meta charset="UTF-8">
 
     <style>
@@ -1406,10 +1484,9 @@ def circular_countdown():
     }
 
     svg {
-        width: 340px;
+        width: 250px;
         max-width: 95%;
         height: auto;
-        overflow: visible;
     }
 
     #timer-number {
@@ -1424,25 +1501,23 @@ def circular_countdown():
     }
 
     #timer-message {
-        font-size: 30px;
+        font-size: 21px;
         font-weight: 800;
-        margin-top: 8px;
-        margin-bottom: 16px;
+        margin-top: 3px;
+        margin-bottom: 8px;
     }
 
     #ring {
-        transition:
-            stroke 0.25s,
-            stroke-dashoffset 0.1s linear;
+        transition: stroke 0.2s;
     }
 
     #sound-button {
         background: #FFFFFF;
         color: #174638;
         border: 1px solid #B8CEC0;
-        border-radius: 12px;
-        padding: 12px 20px;
-        font-size: 22px;
+        border-radius: 8px;
+        padding: 7px 14px;
+        font-size: 15px;
         font-weight: 700;
         cursor: pointer;
     }
@@ -1471,14 +1546,9 @@ def circular_countdown():
         .pulse {
             animation: none;
         }
-
-        #ring {
-            transition: none;
-        }
     }
 
     </style>
-
     </head>
 
     <body>
@@ -1493,7 +1563,7 @@ def circular_countdown():
                 r="120"
                 fill="#FFFFFF"
                 stroke="#DFE9E0"
-                stroke-width="16"
+                stroke-width="14"
             />
 
             <circle
@@ -1503,7 +1573,7 @@ def circular_countdown():
                 r="120"
                 fill="none"
                 stroke="#258052"
-                stroke-width="16"
+                stroke-width="14"
                 stroke-linecap="round"
                 transform="rotate(-90 140 140)"
             />
@@ -1514,9 +1584,7 @@ def circular_countdown():
                 y="149"
                 text-anchor="middle"
                 fill="#258052"
-            >
-                00:30
-            </text>
+            >00:30</text>
 
             <text
                 id="timer-caption"
@@ -1524,9 +1592,7 @@ def circular_countdown():
                 y="180"
                 text-anchor="middle"
                 fill="#63786B"
-            >
-                TIME LEFT
-            </text>
+            >TIME LEFT</text>
 
         </svg>
 
@@ -1581,11 +1647,11 @@ def circular_countdown():
     let animationID = null;
 
 
-    // Generate sound without external MP3 files.
+    // Generate sound using the Web Audio API.
 
     function playTone(
         frequency = 750,
-        duration = 0.15,
+        toneDuration = 0.15,
         delay = 0
     ) {
 
@@ -1597,32 +1663,30 @@ def circular_countdown():
             return;
         }
 
-        const oscillator = audioContext.createOscillator();
+        const oscillator =
+            audioContext.createOscillator();
 
         const gain = audioContext.createGain();
 
-        const now = audioContext.currentTime + delay;
+        const now =
+            audioContext.currentTime + delay;
 
         oscillator.type = "sine";
 
         oscillator.frequency.setValueAtTime(
-            frequency,
-            now
+            frequency, now
         );
 
         gain.gain.setValueAtTime(
-            0.0001,
-            now
+            0.0001, now
         );
 
         gain.gain.exponentialRampToValueAtTime(
-            0.15,
-            now + 0.015
+            0.15, now + 0.015
         );
 
         gain.gain.exponentialRampToValueAtTime(
-            0.0001,
-            now + duration
+            0.0001, now + toneDuration
         );
 
         oscillator.connect(gain);
@@ -1632,7 +1696,7 @@ def circular_countdown():
         oscillator.start(now);
 
         oscillator.stop(
-            now + duration + 0.03
+            now + toneDuration + 0.03
         );
     }
 
@@ -1661,11 +1725,11 @@ def circular_countdown():
     }
 
 
-    // Explicit sound activation handles
-    // browser autoplay restrictions.
+    // User interaction enables browser audio.
 
     soundButton.addEventListener(
         "click",
+
         async function () {
 
             if (soundEnabled) {
@@ -1701,12 +1765,15 @@ def circular_countdown():
                     soundButton.textContent =
                         "🔊 Sound enabled";
 
-                    startSound();
+                    if (getRemaining() > 0) {
+
+                        startSound();
+                    }
 
                 } else {
 
                     soundButton.textContent =
-                        "🔊 Try enabling sound again";
+                        "Try enabling sound again";
                 }
 
             } catch (error) {
@@ -1756,7 +1823,7 @@ def circular_countdown():
             (1 - remaining / duration);
 
 
-        // Green, orange and red stages.
+        // Countdown colour changes.
 
         let color = "#258052";
 
@@ -1764,8 +1831,7 @@ def circular_countdown():
 
             color = "#D64444";
 
-            message.textContent =
-                "Hurry up!";
+            message.textContent = "Hurry up!";
 
         } else if (second <= 15) {
 
@@ -1787,7 +1853,7 @@ def circular_countdown():
         message.style.color = color;
 
 
-        // Final five seconds.
+        // Warning sound for the last five seconds.
 
         if (
             running &&
@@ -1813,7 +1879,7 @@ def circular_countdown():
         }
 
 
-        // Time is up.
+        // Stop at zero.
 
         if (remaining <= 0) {
 
@@ -1841,8 +1907,7 @@ def circular_countdown():
 
         if (!running) {
 
-            message.textContent =
-                "TIMER PAUSED";
+            message.textContent = "TIMER PAUSED";
 
             return;
         }
@@ -1858,10 +1923,11 @@ def circular_countdown():
     updateTimer();
 
 
-    // Clean up when leaving the countdown screen.
+    // Clean up when leaving the countdown.
 
     window.addEventListener(
         "pagehide",
+
         function () {
 
             if (animationID !== null) {
@@ -1891,141 +1957,55 @@ def circular_countdown():
 
     components.html(
         timer_html,
-        height=465,
+        height=335,
         scrolling=False
     )
 
 
 # ============================================================
-# 15. CONFETTI ANIMATION FOR CARBON MASTER
+# 15. COMPACT CONFETTI ANIMATION
 # ============================================================
 
-def show_confetti():
+def confetti_html():
 
-    components.html(
-        """
-        <!DOCTYPE html>
-        <html>
+    # Confetti is now animated inside the result
+    # panel instead of occupying a separate row.
 
-        <body style="
-            margin:0;
-            overflow:hidden;
-            background:transparent;
-        ">
+    colors = [
+        "#258052",
+        "#E9BA39",
+        "#4A90E2",
+        "#F26D78",
+        "#94D6A2",
+        "#9566D4"
+    ]
 
-        <canvas id="confetti"></canvas>
+    pieces = []
 
-        <script>
+    for i in range(65):
 
-        const canvas = document.getElementById(
-            "confetti"
-        );
+        left = (i * 37) % 100
 
-        const ctx = canvas.getContext("2d");
+        delay = (i % 15) * 0.08
 
-        canvas.width = window.innerWidth;
-        canvas.height = 180;
+        duration = 2.0 + (i % 8) * 0.15
 
-        const colors = [
-            "#258052",
-            "#E9BA39",
-            "#4A90E2",
-            "#F26D78",
-            "#94D6A2",
-            "#9566D4"
-        ];
+        color = colors[i % len(colors)]
 
-        let particles = [];
+        pieces.append(
+            f"""
+            <span class="confetti-piece"
+                  style="
+                    left:{left}%;
+                    background:{color};
+                    animation-delay:{delay}s;
+                    animation-duration:{duration}s;
+                  ">
+            </span>
+            """
+        )
 
-        if (!window.matchMedia(
-            "(prefers-reduced-motion: reduce)"
-        ).matches) {
-
-            for (let i = 0; i < 180; i++) {
-
-                particles.push({
-
-                    x: Math.random() * canvas.width,
-
-                    y: -Math.random() * 200,
-
-                    size: 5 + Math.random() * 9,
-
-                    speed: 1.5 + Math.random() * 5,
-
-                    drift: Math.random() * 3 - 1.5,
-
-                    rotation: Math.random() * 6,
-
-                    color: colors[
-                        Math.floor(
-                            Math.random() * colors.length
-                        )
-                    ]
-                });
-            }
-        }
-
-        const start = performance.now();
-
-        function animate(now) {
-
-            ctx.clearRect(
-                0, 0,
-                canvas.width,
-                canvas.height
-            );
-
-            for (const p of particles) {
-
-                p.y += p.speed;
-
-                p.x += p.drift;
-
-                p.rotation += 0.05;
-
-                ctx.save();
-
-                ctx.translate(p.x, p.y);
-
-                ctx.rotate(p.rotation);
-
-                ctx.fillStyle = p.color;
-
-                ctx.fillRect(
-                    0,
-                    0,
-                    p.size,
-                    p.size * 0.65
-                );
-
-                ctx.restore();
-            }
-
-            particles = particles.filter(
-                p => p.y < canvas.height + 20
-            );
-
-            if (
-                now - start < 4500 &&
-                particles.length > 0
-            ) {
-
-                requestAnimationFrame(animate);
-            }
-        }
-
-        requestAnimationFrame(animate);
-
-        </script>
-
-        </body>
-        </html>
-        """,
-
-        height=185,
-        scrolling=False
-    )
+    return "".join(pieces)
 
 
 # ============================================================
@@ -2037,7 +2017,6 @@ def select_footprint(category):
     database = FOOTPRINT_DATABASES[category]
 
     return st.selectbox(
-
         f"{ICONS[category]} {category} card",
 
         options=list(database.keys()),
@@ -2059,7 +2038,6 @@ def select_action(category):
     database = ACTION_DATABASES[category]
 
     return st.selectbox(
-
         f"{ICONS[category]} {category} solution",
 
         options=list(database.keys()) + ["NONE"],
@@ -2069,7 +2047,6 @@ def select_action(category):
         placeholder="Select physical solution card",
 
         format_func=lambda action_id: (
-
             "No action selected"
 
             if action_id == "NONE"
@@ -2108,8 +2085,7 @@ def show_original_footprint():
         )
 
         emissions = original_emissions(
-            category,
-            card_id
+            category, card_id
         )
 
         total += emissions
@@ -2175,7 +2151,6 @@ def registration_screen():
     with st.form("registration_form"):
 
         nickname = st.text_input(
-
             "Participant nickname",
 
             max_chars=30,
@@ -2186,7 +2161,6 @@ def registration_screen():
         )
 
         submitted = st.form_submit_button(
-
             "Start challenge",
 
             type="primary",
@@ -2218,11 +2192,11 @@ def registration_screen():
 
     st.subheader("How to play")
 
-    st.write("""
-    1. Draw one footprint card from each category.
-    2. Discover your total carbon footprint.
-    3. Choose three climate solutions in 30 seconds.
-    4. Reveal your carbon reduction and ranking!
+    st.markdown("""
+1. Draw one footprint card from each category.
+2. Discover your total carbon footprint.
+3. Choose three climate solutions in 30 seconds.
+4. Reveal your carbon reduction and ranking!
     """)
 
     st.caption(
@@ -2256,7 +2230,6 @@ def footprint_screen():
         }
 
         submitted = st.form_submit_button(
-
             "Calculate original footprint",
 
             type="primary",
@@ -2291,8 +2264,6 @@ def ready_screen():
 
     show_original_footprint()
 
-    st.divider()
-
     st.subheader("Your mission")
 
     st.write(
@@ -2306,7 +2277,6 @@ def ready_screen():
     )
 
     if st.button(
-
         "▶ Start 30-second challenge",
 
         type="primary",
@@ -2314,7 +2284,6 @@ def ready_screen():
         use_container_width=True,
 
         key="button_start_challenge"
-
     ):
 
         start_timer()
@@ -2328,6 +2297,7 @@ def ready_screen():
 
         if st.button(
             "Correct footprint selection",
+
             key="button_correct_footprints"
         ):
 
@@ -2350,13 +2320,9 @@ def timer_screen():
 
     show_original_footprint()
 
-    # The circular timer runs directly in the browser.
-    # No repeated Streamlit refreshes are required.
-
     circular_countdown()
 
     if st.button(
-
         "Finish / Enter selected solutions",
 
         type="primary",
@@ -2364,12 +2330,9 @@ def timer_screen():
         use_container_width=True,
 
         key="button_finish_timer"
-
     ):
 
         finish_timer()
-
-    # Hidden by default.
 
     with st.expander(
         "⚙️ Facilitator timer controls",
@@ -2386,7 +2349,6 @@ def timer_screen():
         with c1:
 
             if st.button(
-
                 "⏸ Pause",
 
                 disabled=(
@@ -2397,7 +2359,6 @@ def timer_screen():
                 use_container_width=True,
 
                 key="button_pause_timer"
-
             ):
 
                 pause_timer()
@@ -2407,7 +2368,6 @@ def timer_screen():
         with c2:
 
             if st.button(
-
                 "▶ Resume",
 
                 disabled=(
@@ -2418,7 +2378,6 @@ def timer_screen():
                 use_container_width=True,
 
                 key="button_resume_timer"
-
             ):
 
                 resume_timer()
@@ -2428,13 +2387,11 @@ def timer_screen():
         with c3:
 
             if st.button(
-
                 "↻ Reset",
 
                 use_container_width=True,
 
                 key="button_reset_timer"
-
             ):
 
                 start_timer()
@@ -2453,7 +2410,6 @@ def solution_screen():
     )
 
     st.caption(
-
         f"Selection time: "
         f"{st.session_state.selection_time:.1f} seconds"
     )
@@ -2470,7 +2426,6 @@ def solution_screen():
         }
 
         submitted = st.form_submit_button(
-
             "Reveal my carbon reduction!",
 
             type="primary",
@@ -2483,7 +2438,6 @@ def solution_screen():
             if None in selected.values():
 
                 st.warning(
-
                     "Please enter all three solutions. "
                     "Choose 'No action selected' "
                     "for any missing cards."
@@ -2492,9 +2446,7 @@ def solution_screen():
             else:
 
                 result = calculate_total(
-
                     st.session_state.footprints,
-
                     selected
                 )
 
@@ -2505,13 +2457,9 @@ def solution_screen():
                 if not st.session_state.score_saved:
 
                     save_score(
-
                         st.session_state.nickname,
-
                         result["score"],
-
                         st.session_state.selection_time,
-
                         st.session_state.player_id
                     )
 
@@ -2525,10 +2473,10 @@ def solution_screen():
 
 
 # ============================================================
-# 23. COLOURED RESULT METRIC BOXES
+# 23. COLOURED RESULT BOXES
 # ============================================================
 
-def result_metric(
+def result_metric_html(
     icon,
     label,
     value,
@@ -2537,51 +2485,109 @@ def result_metric(
     text_color
 ):
 
-    st.html(
-        f"""
-        <div class="result-metric"
-             style="
-                 background:{background};
-                 border:2px solid {border};
-                 color:{text_color};
-             ">
+    return f"""
+    <div class="result-metric"
+         style="
+            background:{background};
+            border:1px solid {border};
+            color:{text_color};
+         ">
 
-            <div class="result-metric-icon">
-                {icon}
-            </div>
-
-            <div class="result-metric-label">
-                {escape(label)}
-            </div>
-
-            <div class="result-metric-value">
-                {value:.2f}
-            </div>
-
-            <div class="result-metric-unit">
-                kg CO₂e
-            </div>
-
+        <div class="result-metric-icon">
+            {icon}
         </div>
-        """
+
+        <div class="result-metric-label">
+            {escape(label)}
+        </div>
+
+        <div class="result-metric-value">
+            {escape(str(value))}
+        </div>
+
+        <div class="result-metric-unit">
+            kg CO₂e
+        </div>
+
+    </div>
+    """
+
+
+def combined_result_panel(result):
+
+    score = result["score"]
+
+    title, emoji, message = achievement(score)
+
+    color = (
+        "#258052" if score > 0
+        else "#B94040" if score < 0
+        else "#63786B"
     )
 
+    # Original footprint: red.
 
-def show_result_metrics(result):
+    original_box = result_metric_html(
+        icon="👣",
 
-    c1, c2, c3 = st.columns(3)
+        label="Original footprint",
 
-    # Red: Original footprint
+        value=f"{result['original']:.2f}",
 
-    with c1:
+        background="#FBE6E4",
 
-        result_metric(
+        border="#E9B5B0",
 
-            icon="👣",
+        text_color="#B94040"
+    )
 
-            label="Original footprint",
+    # Remaining footprint: blue.
 
-            value=result["original"],
+    remaining_box = result_metric_html(
+        icon="🌍",
+
+        label="Remaining footprint",
+
+        value=f"{result['new']:.2f}",
+
+        background="#E2EEF9",
+
+        border="#B9D5F0",
+
+        text_color="#3269A8"
+    )
+
+    # Avoided emissions: negative sign.
+    # Increased emissions: positive sign.
+
+    signed_value = signed_emission_change(
+        result["saved"]
+    )
+
+    if result["saved"] >= 0:
+
+        avoided_box = result_metric_html(
+            icon="🌿",
+
+            label="CO₂e avoided",
+
+            value=signed_value,
+
+            background="#DDF2E2",
+
+            border="#B3DCC0",
+
+            text_color="#258052"
+        )
+
+    else:
+
+        avoided_box = result_metric_html(
+            icon="⚠️",
+
+            label="Additional CO₂e",
+
+            value=signed_value,
 
             background="#FBE6E4",
 
@@ -2590,62 +2596,65 @@ def show_result_metrics(result):
             text_color="#B94040"
         )
 
-    # Blue: Remaining footprint
+    # Show confetti only once per participant.
 
-    with c2:
+    celebration = ""
 
-        result_metric(
+    if st.session_state.confetti:
 
-            icon="🌍",
+        celebration = confetti_html()
 
-            label="Remaining footprint",
+        st.session_state.confetti = False
 
-            value=result["new"],
+    # Achievement on the left.
+    # Three emission boxes on the right.
 
-            background="#E2EEF9",
+    st.html(
+        f"""
+        <div class="result-panel">
 
-            border="#B9D5F0",
+            {celebration}
 
-            text_color="#3269A8"
-        )
+            <div class="achievement-panel">
 
-    # Green: CO2e avoided
+                <div class="achievement-emoji">
+                    {emoji}
+                </div>
 
-    with c3:
+                <div class="achievement-title">
+                    {title}
+                </div>
 
-        if result["saved"] >= 0:
+                <div class="score-number"
+                     style="color:{color};">
 
-            result_metric(
+                    {score:.1f}%
 
-                icon="🌿",
+                </div>
 
-                label="CO₂e avoided",
+                <div class="score-label">
+                    CARBON REDUCTION
+                </div>
 
-                value=result["saved"],
+                <div class="score-message">
+                    {message}
+                </div>
 
-                background="#DDF2E2",
+            </div>
 
-                border="#B3DCC0",
+            <div class="summary-metrics">
 
-                text_color="#258052"
-            )
+                {original_box}
 
-        else:
+                {remaining_box}
 
-            result_metric(
+                {avoided_box}
 
-                icon="⚠️",
+            </div>
 
-                label="Additional CO₂e",
-
-                value=abs(result["saved"]),
-
-                background="#FBE6E4",
-
-                border="#E9B5B0",
-
-                text_color="#B94040"
-            )
+        </div>
+        """
+    )
 
 
 # ============================================================
@@ -2682,7 +2691,9 @@ def category_result(row):
 
         status = (
             "❌ No action selected"
+
             if row["status"] == "No action selected"
+
             else "❌ Not practical"
         )
 
@@ -2719,32 +2730,32 @@ def category_result(row):
     )
 
     new_bar_color = (
-        "#359568"
-        if new < original
-        else "#B94040"
-        if new > original
+        "#359568" if new < original
+        else "#B94040" if new > original
         else "#9AA89E"
     )
 
     solution_color = (
         "#258052"
+
         if row["practical"] and reduction > 0
+
         else "#B94040"
+
         if not row["practical"] or reduction < 0
+
         else "#63786B"
     )
 
-    if saved >= 0:
+    signed_value = signed_emission_change(saved)
 
-        saved_text = (
-            f"{saved:.2f} kg CO₂e avoided"
-        )
+    saved_text = (
+        f"{signed_value} kg CO₂e avoided"
 
-    else:
+        if saved >= 0
 
-        saved_text = (
-            f"{abs(saved):.2f} kg CO₂e added"
-        )
+        else f"{signed_value} kg CO₂e added"
+    )
 
     st.html(
         f"""
@@ -2768,17 +2779,23 @@ def category_result(row):
 
             <div class="impact-solution"
                  style="color:{solution_color};">
+
                 {solution_name}
+
             </div>
 
             <div class="impact-reduction"
                  style="color:{color};">
+
                 {reduction:.1f}%
+
             </div>
 
             <div class="impact-status"
                  style="color:{color};">
+
                 {status}
+
             </div>
 
             <div class="impact-bar-label">
@@ -2813,7 +2830,9 @@ def category_result(row):
 
             <div class="impact-saved"
                  style="color:{color};">
+
                 {saved_text}
+
             </div>
 
             <div class="impact-explanation">
@@ -2825,23 +2844,20 @@ def category_result(row):
     )
 
     best = best_solutions(
-
         category,
-
         row["card_id"]
     )
 
     if best:
 
         best_names = " / ".join(
-
             item["action_name"]
-
             for item in best
         )
 
         with st.expander(
             "💡 Best possible solution",
+
             expanded=False
         ):
 
@@ -2850,13 +2866,11 @@ def category_result(row):
             )
 
             st.write(
-
                 f"Maximum reduction: "
                 f"**{best[0]['reduction']:.1f}%**"
             )
 
             st.caption(
-
                 f"Remaining emissions: "
                 f"{best[0]['new']:.2f} kg CO₂e"
             )
@@ -2870,72 +2884,14 @@ def results_screen():
 
     result = st.session_state.result
 
-    score = result["score"]
+    # Compact combined achievement and
+    # coloured footprint boxes.
 
-    title, emoji, message = achievement(score)
-
-    color = (
-        "#258052"
-
-        if score > 0
-
-        else "#B94040"
-
-        if score < 0
-
-        else "#63786B"
-    )
-
-    # Celebration occurs only once per participant.
-
-    if st.session_state.confetti:
-
-        show_confetti()
-
-        st.session_state.confetti = False
-
-    # st.html prevents HTML code from being shown
-    # as an indented Markdown code block.
-
-    st.html(
-        f"""
-        <div class="score-box">
-
-            <div class="achievement-emoji">
-                {emoji}
-            </div>
-
-            <div class="achievement-title">
-                {title}
-            </div>
-
-            <div class="score-number"
-                 style="color:{color};">
-
-                {score:.1f}%
-
-            </div>
-
-            <div class="score-label">
-                CARBON REDUCTION
-            </div>
-
-            <div class="score-message">
-                {message}
-            </div>
-
-        </div>
-        """
-    )
-
-    # Red, blue and green summary boxes.
-
-    show_result_metrics(result)
+    combined_result_panel(result)
 
     scores, count = get_leaderboard()
 
     rank = next(
-
         (
             i + 1
 
@@ -2951,7 +2907,6 @@ def results_screen():
     if rank is not None:
 
         st.success(
-
             f"🏅 Your current ranking: #{rank} "
             f"out of {count} participants"
         )
@@ -2959,29 +2914,24 @@ def results_screen():
     else:
 
         st.info(
-
             "Keep exploring! You are currently "
             "outside the Top 10."
         )
 
     st.caption(
-
         f"Selection time: "
         f"{st.session_state.selection_time:.1f} seconds"
     )
-
-    st.divider()
-
-    # Three category columns instead of three
-    # vertically stacked sections.
 
     st.header(
         "Discover your carbon impact"
     )
 
+    # Transport, Food and Activity in three columns.
+
     columns = st.columns(
         3,
-        gap="medium"
+        gap="small"
     )
 
     for column, row in zip(
@@ -2993,10 +2943,7 @@ def results_screen():
 
             category_result(row)
 
-    st.divider()
-
     if st.button(
-
         "➕ Next participant",
 
         type="primary",
@@ -3004,14 +2951,13 @@ def results_screen():
         use_container_width=True,
 
         key="button_next_participant"
-
     ):
 
         next_participant()
 
 
 # ============================================================
-# 26. PERMANENT ON-SCREEN TOP-10 LEADERBOARD
+# 26. TOP-10 LEADERBOARD
 # ============================================================
 
 def leaderboard_panel():
@@ -3079,11 +3025,14 @@ def leaderboard_panel():
 
                 row_class = ""
 
-            # Escape participant nicknames before
-            # inserting them into HTML.
-
             safe_name = escape(
                 item["name"]
+            )
+
+            score_color = (
+                "#258052"
+                if item["score"] >= 0
+                else "#B94040"
             )
 
             table_rows.append(
@@ -3094,7 +3043,7 @@ def leaderboard_panel():
 
                     <td>{safe_name}</td>
 
-                    <td>
+                    <td style="color:{score_color};">
                         {item['score']:.1f}%
                     </td>
 
@@ -3110,11 +3059,11 @@ def leaderboard_panel():
 
                 <colgroup>
 
-                    <col style="width:19%">
+                    <col style="width:24%">
 
-                    <col style="width:46%">
+                    <col style="width:43%">
 
-                    <col style="width:35%">
+                    <col style="width:33%">
 
                 </colgroup>
 
@@ -3122,7 +3071,9 @@ def leaderboard_panel():
 
                     <tr>
 
-                        <th>Rank</th>
+                        <th style="text-align:center;">
+                            Rank
+                        </th>
 
                         <th>Name</th>
 
@@ -3145,36 +3096,32 @@ def leaderboard_panel():
         )
 
         st.caption(
-
             "Tie-breaker: shorter selection time."
         )
 
-    # Administrative controls are hidden during gameplay.
+    # Reset controls only available
+    # on the registration screen.
 
     if st.session_state.stage == "registration":
 
-        st.divider()
-
         with st.expander(
             "⚙️ Facilitator controls",
+
             expanded=False
         ):
 
             st.caption(
-
                 "Reset only when starting "
                 "a new competition."
             )
 
             confirmed = st.checkbox(
-
                 "Confirm leaderboard reset",
 
                 key="widget_confirm_reset"
             )
 
             if st.button(
-
                 "Reset leaderboard",
 
                 disabled=(
@@ -3185,7 +3132,6 @@ def leaderboard_panel():
                 use_container_width=True,
 
                 key="button_reset_leaderboard"
-
             ):
 
                 reset_leaderboard()
@@ -3194,7 +3140,7 @@ def leaderboard_panel():
 
 
 # ============================================================
-# 27. MAIN APPLICATION HEADER
+# 27. COMPACT APPLICATION HEADER
 # ============================================================
 
 st.html("""
@@ -3214,14 +3160,11 @@ st.html("""
 # 28. MAIN APPLICATION LAYOUT
 # ============================================================
 
-# Wider main screen to accommodate the three
-# carbon impact columns.
+# Main game panel + permanent leaderboard.
 
 main_column, leaderboard_column = st.columns(
-
     [3.2, 1],
-
-    gap="large"
+    gap="medium"
 )
 
 with main_column:
@@ -3230,10 +3173,16 @@ with main_column:
 
     if stage != "registration":
 
-        st.text(
+        safe_nickname = escape(
+            st.session_state.nickname
+        )
 
-            f"Participant: "
-            f"{st.session_state.nickname}"
+        st.html(
+            f"""
+            <div class="participant-name">
+                Participant: <strong>{safe_nickname}</strong>
+            </div>
+            """
         )
 
     if stage == "registration":
@@ -3272,7 +3221,6 @@ with leaderboard_column:
 st.divider()
 
 st.caption(
-
     "Carbon Rush | Learn. Choose. Reduce. | "
     "Educational scenario estimates in kg CO₂e."
 )
