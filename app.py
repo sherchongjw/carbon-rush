@@ -539,13 +539,16 @@ div[role="option"] {
 
 /* Confetti inside the result panel */
 
+/* Confetti inside the result panel */
+
 .confetti-piece {
     position: absolute;
-    top: -20px;
-    width: 9px;
-    height: 13px;
+    top: -30px;
+    width: 12px;
+    height: 18px;
+    border-radius: 2px;
+    z-index: 999;
     pointer-events: none;
-
     animation-name: confetti-fall;
     animation-timing-function: linear;
     animation-fill-mode: both;
@@ -554,20 +557,20 @@ div[role="option"] {
 @keyframes confetti-fall {
 
     0% {
-        transform: translateY(-20px) rotate(0deg);
+        transform: translateY(-30px) rotate(0deg);
         opacity: 0;
     }
 
-    10% {
+    5% {
         opacity: 1;
     }
 
-    85% {
+    90% {
         opacity: 1;
     }
 
     100% {
-        transform: translateY(450px) rotate(720deg);
+        transform: translateY(600px) rotate(1080deg);
         opacity: 0;
     }
 }
@@ -1251,7 +1254,7 @@ def signed_emission_change(saved):
 
 def achievement(score):
 
-    if score >= 90:
+    if score > 80:
 
         return (
             "Carbon Master",
@@ -1280,7 +1283,6 @@ def achievement(score):
         "🌱 💪",
         "Every small step matters. Keep learning!"
     )
-
 
 # ============================================================
 # 11. TEMPORARY ONLINE LEADERBOARD
@@ -1985,27 +1987,26 @@ def circular_countdown():
 
 def confetti_html():
 
-    # Confetti is now animated inside the result
-    # panel instead of occupying a separate row.
-
     colors = [
-        "#258052",
-        "#E9BA39",
-        "#4A90E2",
-        "#F26D78",
-        "#94D6A2",
-        "#9566D4"
+        "#FF1744",
+        "#FFD600",
+        "#2979FF",
+        "#00C853",
+        "#FF9100",
+        "#D500F9",
+        "#00B8D4",
+        "#FF4081"
     ]
 
     pieces = []
 
-    for i in range(65):
+    for i in range(150):
 
         left = (i * 37) % 100
 
-        delay = (i % 15) * 0.08
+        delay = (i % 25) * 0.08
 
-        duration = 2.0 + (i % 8) * 0.15
+        duration = 3.5 + (i % 10) * 0.15
 
         color = colors[i % len(colors)]
 
@@ -2483,7 +2484,7 @@ def solution_screen():
                     st.session_state.score_saved = True
 
                 st.session_state.confetti = (
-                    result["score"] >= 90
+                    result["score"] >= 80
                 )
 
                 go_to("results")
