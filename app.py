@@ -1148,7 +1148,7 @@ def registration_screen():
         "for the top spot!"
     )
 
-    with st.form("registration"):
+    with st.form("registration_form"):
 
         nickname = st.text_input(
             "Participant nickname",
@@ -1211,7 +1211,7 @@ def footprint_screen():
         "Food and Activity."
     )
 
-    with st.form("footprints"):
+    with st.form("footprint_selection_form"):
 
         selected = {
             category: select_footprint(category)
@@ -1310,7 +1310,7 @@ def solution_screen():
 
     show_original_footprint()
 
-    with st.form("solutions"):
+    with st.form("solution_selection_form"):
 
         selected = {
             category: select_action(category)
