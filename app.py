@@ -1262,7 +1262,7 @@ def achievement(score):
             "Outstanding! You are a Carbon Master!"
         )
 
-    elif score >= 70:
+    elif score >= 60:
 
         return (
             "Carbon Champion",
