@@ -3439,6 +3439,6 @@ with leaderboard_column:
 st.divider()
 
 st.caption(
-    "Carbon Rush | Learn. Choose. Reduce. | "
-    "Educational scenario estimates in kg CO₂e."
+    "Carbon Rush | Count it. Cut it. Zero it! | "
+    "UKM IPI Open Fest 2026"
 )
