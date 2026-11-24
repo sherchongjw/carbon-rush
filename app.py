@@ -1479,27 +1479,22 @@ def results_screen():
         else "#52685C"
     )
 
-    st.markdown(
+    st.html(
         f"""
         <div class="score-box">
-
-            <div class="achievement-emoji">
-                {emoji}
-            </div>
-
+            <div class="achievement-emoji">{emoji}</div>
             <h2>{title}</h2>
-
-            <div class="score-number"
-                 style="color:{color};">
+            <div class="score-number" style="color:{color};">
                 {score:.1f}%
             </div>
-
-            <p>CARBON REDUCTION</p>
-            <p>{message}</p>
-
+            <p style="font-size:18px; font-weight:600;">
+                CARBON REDUCTION
+            </p>
+            <p style="font-size:18px;">
+                {message}
+            </p>
         </div>
-        """,
-        unsafe_allow_html=True
+        """
     )
 
     c1, c2, c3 = st.columns(3)
