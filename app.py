@@ -4,6 +4,9 @@ import streamlit.components.v1 as components
 import time
 import uuid
 import json
+import base64
+
+from pathlib import Path
 
 from html import escape
 from threading import Lock
@@ -141,6 +144,20 @@ div[role="option"] {
 
 
 /* Compact main header */
+
+.header-logo {
+    width: 225px;
+    height: auto;
+    max-height: 50px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.header-divider {
+    width: 1px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.4);
+}
 
 .game-header {
     display: flex;
@@ -3140,13 +3157,37 @@ def leaderboard_panel():
 
 
 # ============================================================
-# 27. COMPACT APPLICATION HEADER
+# 27. COMPACT APPLICATION HEADER WITH LOGO
 # ============================================================
 
-st.html("""
+logo_path = (
+    Path(__file__).resolve().parent
+    / "ukm_ipi_openfest_logo.svg"
+)
+
+logo_html = ""
+
+if logo_path.exists():
+
+    logo_base64 = base64.b64encode(
+        logo_path.read_bytes()
+    ).decode("utf-8")
+
+    logo_html = f"""
+    <img
+        class="header-logo"
+        src="data:image/svg+xml;base64,{logo_base64}"
+        alt="UKM IPI OpenFest Logo"
+    >
+    <div class="header-divider"></div>
+    """
+
+st.html(f"""
 <div class="game-header">
 
-    <h1>🌍 CARBON RUSH</h1>
+    {logo_html}
+
+    <h1>CARBON RUSH</h1>
 
     <p>
         30 seconds. 3 choices. How low can you go?
@@ -3154,7 +3195,6 @@ st.html("""
 
 </div>
 """)
-
 
 # ============================================================
 # 28. MAIN APPLICATION LAYOUT
