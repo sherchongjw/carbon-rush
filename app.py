@@ -860,7 +860,7 @@ def countdown():
     else:
         message = "Think fast. Choose wisely."
 
-    st.markdown(
+    st.html(
         f"""
         <div class="timer-box">
 
@@ -900,8 +900,7 @@ def countdown():
             <h2>{message}</h2>
 
         </div>
-        """,
-        unsafe_allow_html=True
+        """
     )
 
     st.progress(
@@ -1663,18 +1662,12 @@ def leaderboard_panel():
 # 23. MAIN APPLICATION INTERFACE
 # ============================================================
 
-st.markdown("""
+st.html("""
 <div class="game-header">
-
     <h1>🌍 CARBON RUSH</h1>
-
-    <p>
-        30 seconds. 3 choices.
-        How low can you go?
-    </p>
-
+    <p>30 seconds. 3 choices. How low can you go?</p>
 </div>
-""", unsafe_allow_html=True)
+""")
 
 main_column, leaderboard_column = st.columns(
     [2.3, 1],
