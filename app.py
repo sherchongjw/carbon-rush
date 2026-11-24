@@ -1460,6 +1460,10 @@ def finish_timer():
 # 14. CIRCULAR COUNTDOWN WITH SOUND
 # ============================================================
 
+# ============================================================
+# 14. CIRCULAR COUNTDOWN WITH AUTOMATIC SOUND
+# ============================================================
+
 def circular_countdown():
 
     remaining = max(
@@ -1530,23 +1534,25 @@ def circular_countdown():
         transition: stroke 0.2s;
     }
 
-    #sound-button {
+    #audio-status {
+        font-size: 13px;
+        color: #63786B;
+        margin-top: 4px;
+    }
+
+    #audio-fallback {
+        display: none;
         background: #FFFFFF;
         color: #174638;
         border: 1px solid #B8CEC0;
         border-radius: 8px;
         padding: 7px 14px;
-        font-size: 15px;
-        font-weight: 700;
+        font-size: 14px;
         cursor: pointer;
     }
 
-    #sound-button:hover {
-        background: #E7EFE8;
-    }
-
     .pulse {
-        animation: pulse 0.7s infinite alternate;
+        animation: pulse 0.5s infinite alternate;
     }
 
     @keyframes pulse {
@@ -1556,7 +1562,7 @@ def circular_countdown():
         }
 
         to {
-            opacity: 0.5;
+            opacity: 0.45;
         }
     }
 
@@ -1619,8 +1625,12 @@ def circular_countdown():
             Think fast. Choose wisely!
         </div>
 
-        <button id="sound-button">
-            🔊 Enable sound
+        <div id="audio-status">
+            🔊 Activating countdown sound...
+        </div>
+
+        <button id="audio-fallback">
+            Enable sound
         </button>
 
     </div>
@@ -1630,9 +1640,7 @@ def circular_countdown():
     const config = __TIMER_SETTINGS__;
 
     const duration = config.duration;
-
     const startRemaining = config.remaining;
-
     const running = config.running;
 
     const startTime = performance.now();
@@ -1647,8 +1655,12 @@ def circular_countdown():
         "timer-message"
     );
 
-    const soundButton = document.getElementById(
-        "sound-button"
+    const audioStatus = document.getElementById(
+        "audio-status"
+    );
+
+    const audioFallback = document.getElementById(
+        "audio-fallback"
     );
 
     const circumference = 2 * Math.PI * 120;
@@ -1658,24 +1670,24 @@ def circular_countdown():
     let previousSecond = Math.ceil(startRemaining);
 
     let completed = false;
-
-    let soundEnabled = false;
-
     let audioContext = null;
-
     let animationID = null;
+    let startSoundPlayed = false;
 
 
-    // Generate sound using the Web Audio API.
+    // ========================================================
+    // SOUND GENERATOR
+    // ========================================================
 
     function playTone(
-        frequency = 750,
-        toneDuration = 0.15,
-        delay = 0
+        frequency,
+        toneDuration = 0.1,
+        delay = 0,
+        volume = 0.12,
+        waveType = "sine"
     ) {
 
         if (
-            !soundEnabled ||
             !audioContext ||
             audioContext.state !== "running"
         ) {
@@ -1685,32 +1697,39 @@ def circular_countdown():
         const oscillator =
             audioContext.createOscillator();
 
-        const gain = audioContext.createGain();
+        const gain =
+            audioContext.createGain();
 
         const now =
             audioContext.currentTime + delay;
 
-        oscillator.type = "sine";
+        oscillator.type = waveType;
 
         oscillator.frequency.setValueAtTime(
-            frequency, now
+            frequency,
+            now
         );
 
         gain.gain.setValueAtTime(
-            0.0001, now
+            0.0001,
+            now
         );
 
         gain.gain.exponentialRampToValueAtTime(
-            0.15, now + 0.015
+            volume,
+            now + 0.008
         );
 
         gain.gain.exponentialRampToValueAtTime(
-            0.0001, now + toneDuration
+            0.0001,
+            now + toneDuration
         );
 
         oscillator.connect(gain);
 
-        gain.connect(audioContext.destination);
+        gain.connect(
+            audioContext.destination
+        );
 
         oscillator.start(now);
 
@@ -1720,89 +1739,216 @@ def circular_countdown():
     }
 
 
+    // ========================================================
+    // STARTING CHIME
+    // ========================================================
+
     function startSound() {
 
-        playTone(550, 0.12, 0);
+        playTone(
+            550, 0.12, 0, 0.13
+        );
 
-        playTone(850, 0.18, 0.15);
+        playTone(
+            850, 0.20, 0.15, 0.15
+        );
     }
 
 
-    function countdownSound() {
+    // ========================================================
+    // REGULAR COUNTDOWN TICK
+    // 29 TO 16 SECONDS
+    // ========================================================
 
-        playTone(900, 0.16);
+    function normalTick() {
+
+        playTone(
+            650,
+            0.065,
+            0,
+            0.09,
+            "triangle"
+        );
     }
 
+
+    // ========================================================
+    // WARNING TICK
+    // 15 TO 6 SECONDS
+    // ========================================================
+
+    function warningTick() {
+
+        playTone(
+            950,
+            0.09,
+            0,
+            0.12,
+            "triangle"
+        );
+    }
+
+
+    // ========================================================
+    // PANIC SOUND
+    // LAST 5 SECONDS
+    // ========================================================
+
+    function panicSound(second) {
+
+        const frequency =
+            1100 + (5 - second) * 150;
+
+        playTone(
+            frequency,
+            0.10,
+            0,
+            0.17,
+            "triangle"
+        );
+
+        playTone(
+            frequency + 200,
+            0.10,
+            0.18,
+            0.17,
+            "triangle"
+        );
+
+        // Triple beeps for the final two seconds.
+
+        if (second <= 2) {
+
+            playTone(
+                frequency + 400,
+                0.12,
+                0.36,
+                0.18,
+                "triangle"
+            );
+        }
+    }
+
+
+    // ========================================================
+    // TIME-UP ALARM
+    // ========================================================
 
     function timeUpSound() {
 
-        playTone(1000, 0.22, 0);
+        playTone(
+            1200, 0.22, 0, 0.20, "triangle"
+        );
 
-        playTone(1000, 0.22, 0.28);
+        playTone(
+            1200, 0.22, 0.30, 0.20, "triangle"
+        );
 
-        playTone(550, 0.55, 0.56);
+        playTone(
+            550, 0.65, 0.60, 0.18, "triangle"
+        );
     }
 
 
-    // User interaction enables browser audio.
+    // ========================================================
+    // AUTOMATIC AUDIO INITIALISATION
+    // ========================================================
 
-    soundButton.addEventListener(
-        "click",
+    async function enableAudio() {
 
-        async function () {
-
-            if (soundEnabled) {
-
-                soundEnabled = false;
-
-                soundButton.textContent =
-                    "🔇 Enable sound";
-
-                return;
-            }
-
-            try {
-
-                if (!audioContext) {
-
-                    const AudioContextClass =
-                        window.AudioContext ||
-                        window.webkitAudioContext;
-
-                    audioContext =
-                        new AudioContextClass();
-                }
-
-                await audioContext.resume();
-
-                soundEnabled = (
-                    audioContext.state === "running"
-                );
-
-                if (soundEnabled) {
-
-                    soundButton.textContent =
-                        "🔊 Sound enabled";
-
-                    if (getRemaining() > 0) {
-
-                        startSound();
-                    }
-
-                } else {
-
-                    soundButton.textContent =
-                        "Try enabling sound again";
-                }
-
-            } catch (error) {
-
-                soundButton.textContent =
-                    "Sound unavailable";
-            }
+        if (!running || getRemaining() <= 0) {
+            return;
         }
+
+        try {
+
+            if (!audioContext) {
+
+                const AudioContextClass =
+                    window.AudioContext ||
+                    window.webkitAudioContext;
+
+                audioContext =
+                    new AudioContextClass();
+            }
+
+            await audioContext.resume();
+
+            if (audioContext.state === "running") {
+
+                audioStatus.textContent =
+                    "🔊 Sound enabled";
+
+                audioFallback.style.display =
+                    "none";
+
+                if (
+                    !startSoundPlayed &&
+                    getRemaining() > 27
+                ) {
+
+                    startSound();
+
+                    startSoundPlayed = true;
+                }
+
+            }
+
+        } catch (error) {
+
+            audioStatus.textContent =
+                "Automatic sound blocked";
+
+            audioFallback.style.display =
+                "inline-block";
+        }
+    }
+
+
+    // Automatically attempt to enable sound.
+
+    if (running) {
+
+        enableAudio();
+
+        // Check whether browser autoplay was blocked.
+
+        setTimeout(function () {
+
+            if (
+                !completed &&
+                (
+                    !audioContext ||
+                    audioContext.state !== "running"
+                )
+            ) {
+
+                audioStatus.textContent =
+                    "Automatic sound blocked by browser";
+
+                audioFallback.style.display =
+                    "inline-block";
+            }
+
+        }, 1000);
+
+    } else {
+
+        audioStatus.textContent = "";
+    }
+
+
+    // Fallback only if the browser blocks autoplay.
+
+    audioFallback.addEventListener(
+        "click",
+        enableAudio
     );
 
+
+    // ========================================================
+    // COUNTDOWN CALCULATION
+    // ========================================================
 
     function getRemaining() {
 
@@ -1842,7 +1988,9 @@ def circular_countdown():
             (1 - remaining / duration);
 
 
-        // Countdown colour changes.
+        // ====================================================
+        // COLOUR AND MESSAGE
+        // ====================================================
 
         let color = "#258052";
 
@@ -1850,7 +1998,8 @@ def circular_countdown():
 
             color = "#D64444";
 
-            message.textContent = "Hurry up!";
+            message.textContent =
+                "HURRY UP!";
 
         } else if (second <= 15) {
 
@@ -1872,17 +2021,34 @@ def circular_countdown():
         message.style.color = color;
 
 
-        // Warning sound for the last five seconds.
+        // ====================================================
+        // PLAY SOUND EVERY SECOND
+        // ====================================================
 
         if (
             running &&
             second !== previousSecond &&
-            second <= 5 &&
             second > 0
         ) {
 
-            countdownSound();
+            if (second <= 5) {
+
+                panicSound(second);
+
+            } else if (second <= 15) {
+
+                warningTick();
+
+            } else {
+
+                normalTick();
+            }
         }
+
+
+        // ====================================================
+        // FLASHING EFFECT FOR FINAL 5 SECONDS
+        // ====================================================
 
         if (
             running &&
@@ -1892,13 +2058,19 @@ def circular_countdown():
 
             number.classList.add("pulse");
 
+            ring.classList.add("pulse");
+
         } else {
 
             number.classList.remove("pulse");
+
+            ring.classList.remove("pulse");
         }
 
 
-        // Stop at zero.
+        // ====================================================
+        // TIME IS UP
+        // ====================================================
 
         if (remaining <= 0) {
 
@@ -1906,10 +2078,16 @@ def circular_countdown():
 
             number.classList.remove("pulse");
 
+            ring.classList.remove("pulse");
+
             message.textContent =
                 "TIME'S UP! Stop selecting cards!";
 
             message.style.color = "#D64444";
+
+            audioStatus.textContent = "";
+
+            audioFallback.style.display = "none";
 
             if (!completed && running) {
 
@@ -1922,7 +2100,9 @@ def circular_countdown():
         }
 
 
-        // Paused countdown.
+        // ====================================================
+        // PAUSED TIMER
+        // ====================================================
 
         if (!running) {
 
@@ -1942,7 +2122,9 @@ def circular_countdown():
     updateTimer();
 
 
-    // Clean up when leaving the countdown.
+    // ========================================================
+    // CLEAN UP WHEN LEAVING TIMER SCREEN
+    // ========================================================
 
     window.addEventListener(
         "pagehide",
@@ -1979,8 +2161,6 @@ def circular_countdown():
         height=335,
         scrolling=False
     )
-
-
 # ============================================================
 # 15. COMPACT CONFETTI ANIMATION
 # ============================================================
