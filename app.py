@@ -1,3 +1,4 @@
+
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -7,7 +8,6 @@ import json
 import base64
 
 from pathlib import Path
-
 from html import escape
 from threading import Lock
 
@@ -539,8 +539,6 @@ div[role="option"] {
 
 /* Confetti inside the result panel */
 
-/* Confetti inside the result panel */
-
 .confetti-piece {
     position: absolute;
     top: -30px;
@@ -623,6 +621,16 @@ div[role="option"] {
     .confetti-piece {
         display: none;
     }
+}
+
+
+/* Scrollable Top 30 leaderboard */
+
+.leaderboard-scroll {
+    max-height: 500px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #258052 #E7EFE8;
 }
 
 </style>
@@ -1023,7 +1031,6 @@ def calculate_category(category, card_id, action_id):
     )
 
     practical = False
-
     new = original
 
     explanation = (
@@ -1254,6 +1261,8 @@ def signed_emission_change(saved):
 
 def achievement(score):
 
+    # Carbon Master: above 80%
+
     if score > 80:
 
         return (
@@ -1261,6 +1270,8 @@ def achievement(score):
             "🎉 🏆 🎉",
             "Outstanding! You are a Carbon Master!"
         )
+
+    # Carbon Champion: 60% to 80%
 
     elif score >= 60:
 
@@ -1270,6 +1281,8 @@ def achievement(score):
             "Excellent choices! Keep making a difference."
         )
 
+    # Carbon Explorer: 40% to below 60%
+
     elif score >= 40:
 
         return (
@@ -1278,11 +1291,14 @@ def achievement(score):
             "Great effort! Keep exploring greener choices."
         )
 
+    # Carbon Learner: below 40%
+
     return (
         "Carbon Learner",
         "🌱 💪",
         "Every small step matters. Keep learning!"
     )
+
 
 # ============================================================
 # 11. TEMPORARY ONLINE LEADERBOARD
@@ -1335,9 +1351,9 @@ def save_score(
             )
         )
 
-        # Only retain the Top 10.
+        # Only retain the Top 30.
 
-        board["scores"] = board["scores"][:10]
+        board["scores"] = board["scores"][:30]
 
 
 def get_leaderboard():
@@ -1454,7 +1470,6 @@ def finish_timer():
     pause_timer()
 
     go_to("actions")
-
 
 
 # ============================================================
@@ -2158,6 +2173,8 @@ def circular_countdown():
         height=335,
         scrolling=False
     )
+
+
 # ============================================================
 # 15. COMPACT CONFETTI ANIMATION
 # ============================================================
@@ -2418,9 +2435,7 @@ def footprint_screen():
     with st.form("footprint_selection_form"):
 
         selected = {
-
             category: select_footprint(category)
-
             for category in FOOTPRINT_DATABASES
         }
 
@@ -2614,9 +2629,7 @@ def solution_screen():
     with st.form("solution_selection_form"):
 
         selected = {
-
             category: select_action(category)
-
             for category in ACTION_DATABASES
         }
 
@@ -2660,8 +2673,10 @@ def solution_screen():
 
                     st.session_state.score_saved = True
 
+                # Confetti is only activated for Carbon Master.
+
                 st.session_state.confetti = (
-                    result["score"] >= 80
+                    result["score"] > 80
                 )
 
                 go_to("results")
@@ -3110,7 +3125,7 @@ def results_screen():
 
         st.info(
             "Keep exploring! You are currently "
-            "outside the Top 10."
+            "outside the Top 30."
         )
 
     st.caption(
@@ -3152,7 +3167,7 @@ def results_screen():
 
 
 # ============================================================
-# 26. TOP-10 LEADERBOARD
+# 26. TOP-30 LEADERBOARD
 # ============================================================
 
 def leaderboard_panel():
@@ -3162,7 +3177,7 @@ def leaderboard_panel():
     st.html(
         f"""
         <div class="leaderboard-header">
-            🏆 TOP 10
+            🏆 TOP 30
         </div>
 
         <div class="leaderboard-description">
@@ -3250,43 +3265,47 @@ def leaderboard_panel():
 
         st.html(
             f"""
-            <table class="leaderboard-table">
+            <div class="leaderboard-scroll">
 
-                <colgroup>
+                <table class="leaderboard-table">
 
-                    <col style="width:24%">
+                    <colgroup>
 
-                    <col style="width:43%">
+                        <col style="width:24%">
 
-                    <col style="width:33%">
+                        <col style="width:43%">
 
-                </colgroup>
+                        <col style="width:33%">
 
-                <thead>
+                    </colgroup>
 
-                    <tr>
+                    <thead>
 
-                        <th style="text-align:center;">
-                            Rank
-                        </th>
+                        <tr>
 
-                        <th>Name</th>
+                            <th style="text-align:center;">
+                                Rank
+                            </th>
 
-                        <th style="text-align:right;">
-                            Score
-                        </th>
+                            <th>Name</th>
 
-                    </tr>
+                            <th style="text-align:right;">
+                                Score
+                            </th>
 
-                </thead>
+                        </tr>
 
-                <tbody>
+                    </thead>
 
-                    {rows_html}
+                    <tbody>
 
-                </tbody>
+                        {rows_html}
 
-            </table>
+                    </tbody>
+
+                </table>
+
+            </div>
             """
         )
 
@@ -3373,6 +3392,7 @@ st.html(f"""
 
 </div>
 """)
+
 
 # ============================================================
 # 28. MAIN APPLICATION LAYOUT
