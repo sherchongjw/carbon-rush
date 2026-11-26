@@ -3359,7 +3359,7 @@ def leaderboard_panel():
 
 logo_path = (
     Path(__file__).resolve().parent
-    / "ukm_ipi_openfest_logo.svg"
+    / "ukm_mylca_logo.svg"
 )
 
 logo_html = ""
